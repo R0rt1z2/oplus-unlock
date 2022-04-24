@@ -1,0 +1,8 @@
+# LK images
+*.img
+*.bin
+*.elf
+
+# Build/cache files
+build
+oplus_unlock/utils/__pycache__
