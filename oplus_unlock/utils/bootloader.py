@@ -54,5 +54,5 @@ class BootloaderImage:
                  # 70 47 => bx   lr
                  o.write(f.read(self.offset) + \
                      bytes.fromhex("00207047"))
-                 f.seek(f.tell() + len(self.sequence) - 2) # pad
+                 f.seek(f.tell() + len(bytes.fromhex("00207047")))
                  o.write(f.read())
