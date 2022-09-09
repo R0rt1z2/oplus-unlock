@@ -1,3 +1,5 @@
+### [⚠️ Now available online](https://lkpatcher.r0rt1z2.com/)
+
 # Enable fastboot on oplus devices
 Script to disable fastboot unlock verification of oplus LK images.
 
