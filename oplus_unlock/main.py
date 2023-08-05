@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 try:
     from utils.logger import Logger
     from utils.bootloader import BootloaderImage
+    from utils.exceptions import NoPatchesFoundException, InvalidImageException
 except ImportError:
     from oplus_unlock.utils.logger import Logger
     from oplus_unlock.utils.bootloader import BootloaderImage
@@ -14,18 +15,24 @@ def main():
 
     parser.add_argument("input_image",  type = str, help="Input bootloader (LK) image.")
     parser.add_argument("-o", "--output", type = str, help="Output (patched) bootloader (LK) image.")
+    parser.add_argument("-p", "--patches", type = str, help="Custom json with patches.")
+    parser.add_argument("-d", "--debug", action = "store_true", default = False, help="Enable debug logging.")
 
     args = parser.parse_args()
 
     if not args.output:
         args.output = "lk-patched.bin"
 
-    logger = Logger()
-    lk = BootloaderImage(image = args.input_image)
+    logger = Logger(debug=args.debug)
+    lk = BootloaderImage(
+        logger=logger,
+        image = args.input_image,
+        patches_file = args.patches
+    )
 
     try:
         lk.parse_image()
-    except Exception as e:
+    except InvalidImageException as e:
         logger.die(f"Provided image is not a valid LK image ({e})!", 2)
 
     logger.log(f"Magic        = {hex(lk.magic)}", 0)
@@ -35,18 +42,11 @@ def main():
     logger.log(f"Mode         = {hex(lk.mode)}", 0)
 
     try:
-        lk.get_lock_sequence()
-    except Exception as e:
-        logger.die(f"Could not find the lock sequence ({e})", 2)
+        lk.apply_patches(args.output)
+    except NoPatchesFoundException as e:
+        logger.die(f"Unable to find valid patches!", 3)
 
-    logger.log(f"Sequence     = {lk.sequence.hex()} (0x{lk.offset:02x})", 0)
-
-    try:
-        lk.update_lock_sequence(args.output)
-    except Exception as e:
-        logger.die(f"Could not enable fastboot ({e})!", 3)
-
-    logger.log(f"Sucessfully enabled fastboot. Check {args.output}!", 4)
+    logger.log(f"Successfully applied {len(lk.patches)} patches ({lk.patches})!", 4)
 
 if __name__ == '__main__':
     main()
