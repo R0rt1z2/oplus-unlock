@@ -19,5 +19,9 @@ oplus-unlock lk.bin [-o patched_lk.bin] [-p patches.json]
 * Use this tool at your own risk. I am not responsible for bricked devices. Please **BACKUP** your bootloader before using this tool.
 * `patches.json` contains example patches, you can modify it and add your own.
 
+
+## How it works?
+It simply replaces the first 4 bytes from one of the found hex sequence(`2de9f04fadf5ac5d` or `f0b5adf5925d`) with `00207047` in lk.bin file.
+
 ## License
 * This tool is licensed under the GNU (v3) General Public License. See `LICENSE` for more details.
